@@ -43,26 +43,31 @@ int main( int argc, char* args[] )
     //********************
     block b("assets/block.bmp");
     b.set_pos(10, 10, 16,16);
-    b.set_speed(20);
-    b.newBlock(1);
-
+    //b.set_speed(20);
     ui u;
 
     while(gameLoop){
         lastTick = SDL_GetTicks();
+        b.set_speed(20);
         while( SDL_PollEvent(&occur)){
             if(occur.type == SDL_QUIT)
                     gameLoop = false;
         }
         const Uint8* keystates = SDL_GetKeyboardState( NULL );
 
-        if(keystates[SDL_SCANCODE_A]){
+        if(keystates[SDL_SCANCODE_LEFT]){
             b.move(-16);
         }
-        if(keystates[SDL_SCANCODE_D]){
+        if(keystates[SDL_SCANCODE_RIGHT]){
             b.move(16);
         }
+        if(keystates[SDL_SCANCODE_DOWN]){
+            b.set_speed(5);
+        }
         if(keystates[SDL_SCANCODE_SPACE]){
+            b.rotate();
+        }
+        if(keystates[SDL_SCANCODE_LSHIFT]){
             b.hold();
         }
 

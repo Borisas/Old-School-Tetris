@@ -23,11 +23,14 @@ class block
         void set_pos(double x, double y, double w, double h);
         void set_speed(int speed);
         void drop();
+        void forceDrop();
         void update();
         void loadBlockSetup(const char* file);
         void newBlock(int id);
         void move(int amount);
+        void rotate();
         void hold();
+        void collision();
     protected:
     private:
         GLuint texture;
@@ -39,8 +42,11 @@ class block
         int tickB;
         int tickC;
         int tickD;
+        int tickE;
         bool holding;
         int c_hold;
+        bool c_drop;
+        vector<bool> moving;
         vector<box> held;
         vector<box> temporary;
         vector<vector<box> > b_db;
