@@ -26,3 +26,25 @@ void core::draw(GLuint texture, box position){
     glVertex3f(position.x,position.y+position.h,0);
     glEnd();
 };
+bool core::ticker(int* ticker, int sleep){
+    if(*ticker >= sleep){
+        *ticker = 0;
+        return true;
+    }
+    *ticker+=1;
+    return false;
+};
+void core::fillRectangle(box draw, double R, double G, double B){
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glColor3f(R,G,B);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0,0);
+    glVertex3f(draw.x,draw.y,0);
+    glTexCoord2f(1,0);
+    glVertex3f(draw.x + draw.w,draw.y,0);
+    glTexCoord2f(1,1);
+    glVertex3f(draw.x + draw.w,draw.y + draw.h,0);
+    glTexCoord2f(0,1);
+    glVertex3f(draw.x,draw.y+draw.h,0);
+    glEnd();
+};

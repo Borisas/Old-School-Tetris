@@ -3,6 +3,7 @@
 #include "SDL2/SDL_opengl.h"
 #include "core.h"
 #include "block.h"
+#include "UI.h"
 #include <iostream>
 using namespace std;
 
@@ -18,7 +19,7 @@ int main( int argc, char* args[] )
 		gameLoop = false;
 	}
 	SDL_Window* window = NULL;
-	window = SDL_CreateWindow("TetrisVgtu", SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED, 1024, 768, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("TetrisVgtu", SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if(window == NULL)
     {
         gameLoop=false;
@@ -29,7 +30,7 @@ int main( int argc, char* args[] )
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glOrtho(0,1024,768,0,-1,1);
+    glOrtho(0,640,480,0,-1,1);
 
     SDL_Event occur;
 
@@ -45,18 +46,31 @@ int main( int argc, char* args[] )
     b.set_speed(20);
     b.newBlock(1);
 
+    ui u;
+
     while(gameLoop){
         lastTick = SDL_GetTicks();
         while( SDL_PollEvent(&occur)){
             if(occur.type == SDL_QUIT)
                     gameLoop = false;
         }
+        const Uint8* keystates = SDL_GetKeyboardState( NULL );
+
+        if(keystates[SDL_SCANCODE_A]){
+            b.move(-16);
+        }
+        if(keystates[SDL_SCANCODE_D]){
+            b.move(16);
+        }
+        if(keystates[SDL_SCANCODE_SPACE]){
+            b.hold();
+        }
+
         glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        u.draw();
         b.update();
-
-
 
 
         //FPS CONTROL---

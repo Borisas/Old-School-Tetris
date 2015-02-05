@@ -26,15 +26,23 @@ class block
         void update();
         void loadBlockSetup(const char* file);
         void newBlock(int id);
-
+        void move(int amount);
+        void hold();
     protected:
     private:
         GLuint texture;
         box startPos;
         box position;
+        int current;
         int speed;
         int tickA;
         int tickB;
+        int tickC;
+        int tickD;
+        bool holding;
+        int c_hold;
+        vector<box> held;
+        vector<box> temporary;
         vector<vector<box> > b_db;
         vector<vector<box> > currentBlocks;
 };
