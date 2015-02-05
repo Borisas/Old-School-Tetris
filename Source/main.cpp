@@ -42,6 +42,8 @@ int main( int argc, char* args[] )
     //********************
     block b("assets/block.bmp");
     b.set_pos(10, 10, 16,16);
+    b.set_speed(20);
+    b.newBlock(1);
 
     while(gameLoop){
         lastTick = SDL_GetTicks();
@@ -52,7 +54,7 @@ int main( int argc, char* args[] )
         glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        b.draw();
+        b.update();
 
 
 
