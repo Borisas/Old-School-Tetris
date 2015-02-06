@@ -1,5 +1,7 @@
 #include "block.h"
 
+#define PI 3.14159265
+
 block::block(const char* img)
 {
     this->texture = core::loadImg(img);
@@ -120,6 +122,7 @@ void block::newBlock(int id){
     this->moving.push_back(true);
     this->current = this->currentBlocks.size()-1;
     this->c_hold ++;
+    this->rotation = 0;
 }
 void block::move(int amount){
     if(core::ticker(&tickC, (4+this->speed/2))){
@@ -181,13 +184,41 @@ void block::hold(){
     }
 }
 void block::rotate(){
+
     if(core::ticker(&tickE, 20)){
+        rotation++;
+        int temp = 0;
+        if(rotation>4)
+            rotation = 0;
+        double degrees = this->rotation*90;
         int cx = this->currentBlocks[this->current][0].x;
         int cy = this->currentBlocks[this->current][0].y;
         for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
-            int temp = this->currentBlocks[this->current][i].x-cx;
-            this->currentBlocks[this->current][i].x = this->currentBlocks[this->current][i].y-cy+cx;
-            this->currentBlocks[this->current][i].y = temp+cy;
+            cout << "OLD " << endl << i << " = " << this->currentBlocks[this->current][i].x << " : " <<
+                this->currentBlocks[this->current][i].y << endl;
+            this->currentBlocks[this->current][i].x -= cx;
+            this->currentBlocks[this->current][i].y -= cy;
+        }
+        cout << endl;
+        for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
+            //x' = x cos f - y sin f
+            //y' = y cos f + x sin f
+            /*this->currentBlocks[this->current][i].x = sqrt(this->currentBlocks[this->current][i].x*this->currentBlocks[this->current][i].x + this->currentBlocks[this->current][i].y*this->currentBlocks[this->current][i].y) *
+                round(cos(atan2(this->currentBlocks[this->current][i].y,this->currentBlocks[this->current][i].x) + degrees));
+            this->currentBlocks[this->current][i].x = sqrt(this->currentBlocks[this->current][i].x*this->currentBlocks[this->current][i].x + this->currentBlocks[this->current][i].y*this->currentBlocks[this->current][i].y) *
+                round(sin(atan2(this->currentBlocks[this->current][i].y,this->currentBlocks[this->current][i].x) + degrees));*/
+            //x' = - (y * 1)
+            //y' = (x * 1)
+            temp = this->currentBlocks[this->current][i].x;
+            this->currentBlocks[this->current][i].x = -1*(this->currentBlocks[this->current][i].y);
+            this->currentBlocks[this->current][i].y = temp;
+            this->currentBlocks[this->current][i].x += cx;
+            this->currentBlocks[this->current][i].y += cy;
+        }
+        cout << round(sin(degrees)) << " -=- " << round(cos(degrees)) << endl;
+        for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
+            cout << i << " = " << this->currentBlocks[this->current][i].x << " : " <<
+                this->currentBlocks[this->current][i].y << endl;
         }
     }
 }

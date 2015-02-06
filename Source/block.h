@@ -11,6 +11,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <time.h>
+#include <cmath>
 using namespace std;
 
 
@@ -38,6 +39,7 @@ class block
         box position;
         int current;
         int speed;
+        int rotation;
         int tickA;
         int tickB;
         int tickC;
