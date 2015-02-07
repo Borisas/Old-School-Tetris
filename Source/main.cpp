@@ -41,7 +41,7 @@ int main( int argc, char* args[] )
     int milliPeriod = (int)period;
     int sleep;
     //********************
-    block b("assets/block.bmp");
+    block b("assets/block.bmp", "assets/falling.bmp");
     b.set_pos(10, 10, 16,16);
     //b.set_speed(20);
     ui u;

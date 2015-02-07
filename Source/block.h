@@ -18,7 +18,7 @@ using namespace std;
 class block
 {
     public:
-        block(const char* img);
+        block(const char* img, const char* fallimg);
         virtual ~block();
         void draw();
         void set_pos(double x, double y, double w, double h);
@@ -32,12 +32,17 @@ class block
         void rotate();
         void hold();
         void collision();
+        void stopMoving();
+        void changePos(int x, int y, int id);
+        void checkClear();
+        void clear(int line);
     protected:
     private:
         GLuint texture;
+        GLuint fall_texture;
         box startPos;
         box position;
-        int current;
+        unsigned int current;
         int speed;
         int rotation;
         int tickA;
@@ -45,6 +50,7 @@ class block
         int tickC;
         int tickD;
         int tickE;
+        int tickF;
         bool holding;
         int c_hold;
         bool c_drop;

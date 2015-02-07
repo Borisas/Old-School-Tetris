@@ -17,7 +17,10 @@ namespace core{
     bool ticker(int* ticker, int sleep);
     bool controls_ticker(int* ticker, int sleep);
     void fillRectangle(box draw, double R, double G, double B);
-    //void resetY(vector<box> block);
+    box getBox(vector<box> block);
+    bool collision(box a, box b);
+    bool collisionR(box a, box b);
+    bool collisionL(box a, box b);
 }
 
 #endif

@@ -7,5 +7,9 @@ struct box{
     double w;
     double h;
 };
+struct pos{
+    unsigned int x;
+    unsigned int y;
+};
 
 #endif

@@ -2,14 +2,17 @@
 
 #define PI 3.14159265
 
-block::block(const char* img)
+block::block(const char* img, const char* fallimg)
 {
     this->texture = core::loadImg(img);
+    this->fall_texture = core::loadImg(fallimg);
     this->speed = 10;
     this->tickA = 0;
     this->tickB = 0;
     this->tickC = 0;
     this->tickD = 0;
+    this->tickE = 0;
+    this->tickF = 0;
     this->startPos.x = 310;
     this->startPos.y = 0;
     this->holding = false;
@@ -25,15 +28,18 @@ block::~block()
 }
 
 void block::draw(){
-    //core::draw(this->texture, this->position);
     for(unsigned int i = 0; i < this->currentBlocks.size(); i++){
         for(unsigned int j = 0; j < this->currentBlocks[i].size(); j++){
-            core::draw(this->texture, this->currentBlocks[i][j]);
+            if(i == this->current)
+                core::draw(this->fall_texture, this->currentBlocks[i][j]);
+            else
+                core::draw(this->texture, this->currentBlocks[i][j]);
         }
     }
     if(this->holding){
-        int sx = this->held[0].x;
-        int sy = this->held[0].y;
+        box now = core::getBox(this->held);
+        int sx = now.x;
+        int sy = now.y;
         for(unsigned int i = 0; i < this->held.size(); i ++){
             this->temporary.push_back(this->held[i]);
         }
@@ -42,7 +48,7 @@ void block::draw(){
             this->temporary[i].y = this->held[i].y - sy + 82;
         }
         for(unsigned int i = 0; i < this->temporary.size(); i++)
-            core::draw(this->texture, this->temporary[i]);
+            core::draw(this->fall_texture, this->temporary[i]);
         this->temporary.clear();
     }
 }
@@ -57,7 +63,6 @@ void block::drop(){
         for(unsigned int i = 0; i < this->currentBlocks.size(); i++){
             if(this->moving[i]){
                 for(unsigned int j = 0; j < this->currentBlocks[i].size(); j++){
-                    core::draw(this->texture, this->currentBlocks[i][j]);
                     this->currentBlocks[i][j].y +=16;
                     if(this->currentBlocks[i][j].y+this->currentBlocks[i][j].h >= 465)
                         this->moving[i] = false;
@@ -70,24 +75,22 @@ void block::set_speed(int speed){
     this->speed = speed;
 }
 void block::update(){
-    this->draw();
-    this->drop();
-    int temp = 0;
     if(this->c_drop){
         int random = rand() % (this->b_db.size()-1);
         this->newBlock(random);
         this->c_drop = false;
     }
-    for(unsigned int i = 0; i < this->moving.size(); i ++){
-        if(this->moving[i])
-            temp+=1;
-    }
-    if(temp == 0)
-        this->c_drop = true;
+    this->draw();
+    this->collision();
+    this->drop();
+    this->checkClear();
     if(tickB < 4+this->speed/2)
         tickB++;
     if(tickE < 20)
         tickE++;
+    if(!this->moving[this->current])
+        if(core::ticker(&tickF, 60))
+            this->c_drop = true;
 }
 void block::loadBlockSetup(const char* file){
     ifstream b_file(file);
@@ -126,6 +129,7 @@ void block::newBlock(int id){
 }
 void block::move(int amount){
     if(core::ticker(&tickC, (4+this->speed/2))){
+        this->tickF = 0;
         int checker = 0;
         for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
             int cx = this->currentBlocks[this->current][i].x;
@@ -133,11 +137,28 @@ void block::move(int amount){
             if(amount > 0){
                 if(cx + cw + amount > 426)
                     checker++;
+                for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
+                    for(unsigned int j = 0; j <  this->currentBlocks[i].size(); j++){
+                        for(unsigned int k = 0; k < this->currentBlocks[this->current].size(); k++){
+                            if(core::collisionR(this->currentBlocks[this->current][k], this->currentBlocks[i][j]))
+                                checker++;
+                        }
+                    }
+                }
             }
             if(amount < 0){
                 if(cx + amount < 226)
                     checker++;
+                for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
+                    for(unsigned int j = 0; j <  this->currentBlocks[i].size(); j++){
+                        for(unsigned int k = 0; k < this->currentBlocks[this->current].size(); k++){
+                            if(core::collisionL(this->currentBlocks[this->current][k], this->currentBlocks[i][j]))
+                                checker++;
+                        }
+                    }
+                }
             }
+
         }
         if(checker == 0){
             for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
@@ -184,48 +205,79 @@ void block::hold(){
     }
 }
 void block::rotate(){
-
     if(core::ticker(&tickE, 20)){
-        rotation++;
-        int temp = 0;
-        if(rotation>4)
-            rotation = 0;
-        double degrees = this->rotation*90;
-        int cx = this->currentBlocks[this->current][0].x;
-        int cy = this->currentBlocks[this->current][0].y;
+        this->tickF = 0;
+        int temp;
+        box now = core::getBox(this->currentBlocks[this->current]);
+        int cx = now.x;
+        int cy = now.y;
         for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
-            cout << "OLD " << endl << i << " = " << this->currentBlocks[this->current][i].x << " : " <<
-                this->currentBlocks[this->current][i].y << endl;
             this->currentBlocks[this->current][i].x -= cx;
             this->currentBlocks[this->current][i].y -= cy;
         }
-        cout << endl;
         for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
-            //x' = x cos f - y sin f
-            //y' = y cos f + x sin f
-            /*this->currentBlocks[this->current][i].x = sqrt(this->currentBlocks[this->current][i].x*this->currentBlocks[this->current][i].x + this->currentBlocks[this->current][i].y*this->currentBlocks[this->current][i].y) *
-                round(cos(atan2(this->currentBlocks[this->current][i].y,this->currentBlocks[this->current][i].x) + degrees));
-            this->currentBlocks[this->current][i].x = sqrt(this->currentBlocks[this->current][i].x*this->currentBlocks[this->current][i].x + this->currentBlocks[this->current][i].y*this->currentBlocks[this->current][i].y) *
-                round(sin(atan2(this->currentBlocks[this->current][i].y,this->currentBlocks[this->current][i].x) + degrees));*/
-            //x' = - (y * 1)
-            //y' = (x * 1)
             temp = this->currentBlocks[this->current][i].x;
             this->currentBlocks[this->current][i].x = -1*(this->currentBlocks[this->current][i].y);
             this->currentBlocks[this->current][i].y = temp;
-            this->currentBlocks[this->current][i].x += cx;
-            this->currentBlocks[this->current][i].y += cy;
         }
-        cout << round(sin(degrees)) << " -=- " << round(cos(degrees)) << endl;
+        now = core::getBox(this->currentBlocks[this->current]);
+        int cxa = now.x;
+        int cya = now.y;
         for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
-            cout << i << " = " << this->currentBlocks[this->current][i].x << " : " <<
-                this->currentBlocks[this->current][i].y << endl;
+            this->currentBlocks[this->current][i].x -= cxa -cx;
+            this->currentBlocks[this->current][i].y -= cya -cy;
         }
+
+
     }
 }
 void block::collision(){
-    int start = 0;
-    for(unsigned int i = 0; i < this->moving.size(); i++){
-        if(this->moving[i]){
+    for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
+        for(unsigned int j = 0; j <  this->currentBlocks[i].size(); j++){
+            for(unsigned int k = 0; k < this->currentBlocks[this->current].size(); k++){
+                if(core::collision(this->currentBlocks[this->current][k], this->currentBlocks[i][j]))
+                    this->moving[this->current] = false;
+                /*if(!(core::collision(this->currentBlocks[this->current][k], this->currentBlocks[i][j])) &&
+                    this->currentBlocks[this->current][k].y+this->currentBlocks[this->current][k].h >= 465)
+                    this->moving[this->current] = true;*/
+            }
+        }
+    }
+}
+void block::stopMoving(){
+    this->moving[this->current] = false;
+    if(core::ticker(&tickF, 50)){
+        this->c_drop = true;
+    }
+}
+void block::changePos(int x, int y, int id){
+    for(unsigned int i = 0; i < this->currentBlocks[id].size(); i++){
+        this->currentBlocks[id][i].x += x;
+        this->currentBlocks[id][i].y += y;
+    }
+}
+void block::checkClear(){
+    for(int k = 0; k < 30; k++){
+        int blockCount = 0;
+        for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
+            for(unsigned int j = 0; j < this->currentBlocks[i].size(); j ++){
+                if(this->currentBlocks[i][j].y == k*16)
+                    blockCount ++;
+            }
+        }
+        if(blockCount >= 12)
+            this->clear(k);
+    }
+}
+void block::clear(int line){
+    for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
+        for(unsigned int j = 0; j < this->currentBlocks[i].size(); j ++){
+            if(this->currentBlocks[i][j].y == line*16){
+                this->currentBlocks[i].erase(this->currentBlocks[i].begin() + j);
+                j--;
+            }
+            if(this->currentBlocks[i][j].y < line*16)
+                this->currentBlocks[i][j].y +=16;
         }
     }
 }

@@ -48,3 +48,66 @@ void core::fillRectangle(box draw, double R, double G, double B){
     glVertex3f(draw.x,draw.y+draw.h,0);
     glEnd();
 };
+box core::getBox(vector<box> block){
+    box temp;
+    temp.x = block[0].x;
+    temp.y = block[0].y;
+    temp.w = block[0].w;
+    temp.h = block[0].h;
+    for(unsigned int i = 0; i < block.size(); i++){
+        if(block[i].x < temp.x)
+            temp.x = block[i].x;
+        if(block[i].y < temp.y)
+            temp.y = block[i].y;
+        if(block[i].w + block[i].x > temp.w)
+            temp.w = block[i].w + block[i].x;
+        if(block[i].h + block[i].y > temp.h)
+            temp.h = block[i].h + block[i].y;
+    }
+    return temp;
+};
+bool core::collision(box a, box b){
+    int leftA,leftB;
+	int rightA,rightB;
+	int topA, topB;
+	int botA, botB;
+
+	leftA = a.x;	leftB = b.x;
+	rightA = a.x+a.w;	rightB = b.x+b.w;
+	topA = a.y;	topB = b.y;
+	botA = a.y+a.h;	botB = b.y + b.h;
+
+	if(botA >= topB && topA <= botB && leftA < rightB && rightA > leftB)
+		return true;
+	return false;
+};
+bool core::collisionR(box a, box b){
+    int leftA,leftB;
+	int rightA,rightB;
+	int topA, topB;
+	int botA, botB;
+
+	leftA = a.x;	leftB = b.x;
+	rightA = a.x+a.w;	rightB = b.x+b.w;
+	topA = a.y;	topB = b.y;
+	botA = a.y+a.h;	botB = b.y + b.h;
+
+	if(botA > topB && topA < botB && leftA < rightB && rightA >= leftB)
+		return true;
+	return false;
+};
+bool core::collisionL(box a, box b){
+    int leftA,leftB;
+	int rightA,rightB;
+	int topA, topB;
+	int botA, botB;
+
+	leftA = a.x;	leftB = b.x;
+	rightA = a.x+a.w;	rightB = b.x+b.w;
+	topA = a.y;	topB = b.y;
+	botA = a.y+a.h;	botB = b.y + b.h;
+
+	if(botA > topB && topA < botB && leftA <= rightB && rightA > leftB)
+		return true;
+	return false;
+};
