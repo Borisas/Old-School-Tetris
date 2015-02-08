@@ -25,7 +25,7 @@ class block
         void set_speed(int speed);
         void drop();
         void forceDrop();
-        void update();
+        void update(int *score);
         void loadBlockSetup(const char* file);
         void newBlock(int id);
         void move(int amount);
@@ -34,8 +34,9 @@ class block
         void collision();
         void stopMoving();
         void changePos(int x, int y, int id);
-        void checkClear();
+        int checkClear();
         void clear(int line);
+        void clean();
     protected:
     private:
         GLuint texture;
@@ -54,6 +55,7 @@ class block
         bool holding;
         int c_hold;
         bool c_drop;
+        int next;
         vector<bool> moving;
         vector<box> held;
         vector<box> temporary;

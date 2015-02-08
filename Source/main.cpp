@@ -1,10 +1,12 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
+#include "SDL2/SDL_ttf.h"
 #include "SDL2/SDL_opengl.h"
 #include "core.h"
 #include "block.h"
 #include "UI.h"
 #include <iostream>
+#include <string>
 using namespace std;
 
 
@@ -18,12 +20,17 @@ int main( int argc, char* args[] )
         cout << "SDL_Error:%s\n" <<SDL_GetError() << endl;
 		gameLoop = false;
 	}
+
 	SDL_Window* window = NULL;
 	window = SDL_CreateWindow("TetrisVgtu", SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED, 640, 480, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
     if(window == NULL)
     {
         gameLoop=false;
         printf("SDL_Error:%s\n",SDL_GetError());
+    }
+    if(TTF_Init() == -1) {
+        cout << "TTF_Init_Error: %s\n" << TTF_GetError() << endl;
+        gameLoop = false;
     }
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
     context = SDL_GL_CreateContext(window);
@@ -46,9 +53,12 @@ int main( int argc, char* args[] )
     //b.set_speed(20);
     ui u;
 
+    int score = 0;
+    int difficulty = 0;
+
     while(gameLoop){
         lastTick = SDL_GetTicks();
-        b.set_speed(20);
+        b.set_speed(20-difficulty);
         while( SDL_PollEvent(&occur)){
             if(occur.type == SDL_QUIT)
                     gameLoop = false;
@@ -74,8 +84,9 @@ int main( int argc, char* args[] )
         glClearColor(0,0,0,1);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        u.draw();
-        b.update();
+        //core::renderText(10,10, "SCORE", 22);
+        u.draw(score);
+        b.update(&score);
 
 
         //FPS CONTROL---
@@ -90,5 +101,6 @@ int main( int argc, char* args[] )
     glDisable(GL_BLEND);
 	SDL_DestroyWindow(window);
     SDL_Quit();
+    TTF_Quit();
 	return 0;
 };

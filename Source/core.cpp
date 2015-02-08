@@ -111,3 +111,78 @@ bool core::collisionL(box a, box b){
 		return true;
 	return false;
 };
+void core::renderText(int x, int y, string text, int fontSize){
+    SDL_Color color = {255, 255, 255, 255};
+    SDL_Surface* textSurface;
+    TTF_Font *font = TTF_OpenFont("assets/font.ttf", fontSize);
+    textSurface = TTF_RenderText_Blended(font, text.c_str(), color);
+    if(textSurface != 0){
+        GLuint Texture = SDLSurfaceToTexture(textSurface);
+
+        box pos;
+        pos.x = x;
+        pos.y = y;
+        pos.w = textSurface->w;
+        pos.h = textSurface->h;
+        core::draw(Texture,pos);
+        glDeleteTextures(1, &Texture);
+        SDL_FreeSurface(textSurface);
+        TTF_CloseFont(font);
+	}
+	else{
+        cout << "failed to create string" << endl;
+    }
+};
+GLuint core::SDLSurfaceToTexture(SDL_Surface* surface)
+{
+    GLuint texture;
+    GLint nOfColors;
+    GLenum texture_format;
+
+    // get the number of channels in the SDL surface
+    nOfColors = surface->format->BytesPerPixel;
+
+    if (nOfColors == 4)     // contains an alpha channel
+    {
+        if (surface->format->Rmask == 0x000000ff)
+            texture_format = GL_RGBA;
+        else
+            texture_format = GL_BGRA;
+    }
+    else if (nOfColors == 3)
+    {
+        if (surface->format->Rmask == 0x000000ff)
+            texture_format = GL_RGB;
+        else
+            texture_format = GL_BGR;
+    }
+    else
+    {
+        printf("Picture with less than 24-bit color depth detected.\n");
+        return 0;
+    }
+
+    // Have OpenGL generate a texture object handle for us
+    glGenTextures(1, &texture);
+
+    // Bind the texture object
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Set the texture's stretching properties
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    // Edit the texture object's image data using the information SDL_Surface gives us
+    glTexImage2D(GL_TEXTURE_2D, 0, nOfColors, surface->w, surface->h, 0,
+    texture_format, GL_UNSIGNED_BYTE, surface->pixels);
+
+    // Bind the texture to which subsequent calls refer to
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    return texture;
+}
+string core::toString(int number){
+    stringstream ss;
+    ss << number;
+    return ss.str();
+}

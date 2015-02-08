@@ -16,9 +16,10 @@ block::block(const char* img, const char* fallimg)
     this->startPos.x = 310;
     this->startPos.y = 0;
     this->holding = false;
-    this->loadBlockSetup("blocks.txt");
+    this->loadBlockSetup("assets/blocks.txt");
     srand (time(NULL));
     this->c_drop = true;
+    this->next = rand() % (this->b_db.size()-1);
     //ctor
 }
 
@@ -36,6 +37,12 @@ void block::draw(){
                 core::draw(this->texture, this->currentBlocks[i][j]);
         }
     }
+    for(unsigned int i = 0; i < this->b_db[this->next].size(); i++){
+        box temp = this->b_db[this->next][i];
+        temp.x += 190;
+        temp.y += 60;
+        core::draw(this->fall_texture, temp);
+    }
     if(this->holding){
         box now = core::getBox(this->held);
         int sx = now.x;
@@ -44,8 +51,8 @@ void block::draw(){
             this->temporary.push_back(this->held[i]);
         }
         for(unsigned int i = 0; i < this->temporary.size(); i++){
-            this->temporary[i].x = (this->held[i].x - sx) + 517;
-            this->temporary[i].y = this->held[i].y - sy + 82;
+            this->temporary[i].x = (this->held[i].x - sx) + 102;
+            this->temporary[i].y = this->held[i].y - sy + 65;
         }
         for(unsigned int i = 0; i < this->temporary.size(); i++)
             core::draw(this->fall_texture, this->temporary[i]);
@@ -58,32 +65,22 @@ void block::set_pos(double x, double y, double w, double h){
     this->position.h = h;
     this->position.w = w;
 }
-void block::drop(){
-    if(core::ticker(&tickA, speed)){
-        for(unsigned int i = 0; i < this->currentBlocks.size(); i++){
-            if(this->moving[i]){
-                for(unsigned int j = 0; j < this->currentBlocks[i].size(); j++){
-                    this->currentBlocks[i][j].y +=16;
-                    if(this->currentBlocks[i][j].y+this->currentBlocks[i][j].h >= 465)
-                        this->moving[i] = false;
-                }
-            }
-        }
-    }
-}
 void block::set_speed(int speed){
     this->speed = speed;
 }
-void block::update(){
+void block::update(int *score){
     if(this->c_drop){
-        int random = rand() % (this->b_db.size()-1);
-        this->newBlock(random);
+        this->newBlock(this->next);
         this->c_drop = false;
+
     }
     this->draw();
     this->collision();
     this->drop();
-    this->checkClear();
+    int cls = this->checkClear();
+
+    *score += 100*cls*cls;
+    block::clean();
     if(tickB < 4+this->speed/2)
         tickB++;
     if(tickE < 20)
@@ -91,6 +88,9 @@ void block::update(){
     if(!this->moving[this->current])
         if(core::ticker(&tickF, 60))
             this->c_drop = true;
+
+
+    core::renderText(500,300, "NEXT [id]: "+core::toString(this->next), 22);
 }
 void block::loadBlockSetup(const char* file){
     ifstream b_file(file);
@@ -126,6 +126,15 @@ void block::newBlock(int id){
     this->current = this->currentBlocks.size()-1;
     this->c_hold ++;
     this->rotation = 0;
+    int random = rand() % (this->b_db.size()-1);
+        if(this->next == random){
+            if(this->next == this->b_db.size()-1)
+                this->next -= 1;
+            else
+                this->next +=1;
+        }
+        else
+            this->next = random;
 }
 void block::move(int amount){
     if(core::ticker(&tickC, (4+this->speed/2))){
@@ -232,17 +241,32 @@ void block::rotate(){
     }
 }
 void block::collision(){
+    this->moving[this->current] = true;
     for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
         for(unsigned int j = 0; j <  this->currentBlocks[i].size(); j++){
             for(unsigned int k = 0; k < this->currentBlocks[this->current].size(); k++){
-                if(core::collision(this->currentBlocks[this->current][k], this->currentBlocks[i][j]))
+                if(core::collision(this->currentBlocks[this->current][k], this->currentBlocks[i][j])
+                    || this->currentBlocks[this->current][k].y + this->currentBlocks[this->current][k].h > 465){
                     this->moving[this->current] = false;
-                /*if(!(core::collision(this->currentBlocks[this->current][k], this->currentBlocks[i][j])) &&
-                    this->currentBlocks[this->current][k].y+this->currentBlocks[this->current][k].h >= 465)
-                    this->moving[this->current] = true;*/
+
+                }
             }
         }
     }
+}
+void block::drop(){
+        int t = 0;
+        for(unsigned int i =0; i < this->currentBlocks[this->current].size(); i++){
+            if(this->currentBlocks[this->current][i].y + this->currentBlocks[this->current][i].h > 465)
+                t++;
+        }
+        if(t != 0)
+            this->moving[this->current] = false;
+        else if (t == 0 && this->moving[this->current])
+            if(core::ticker(&tickA, speed))
+                for(unsigned int i =0; i < this->currentBlocks[this->current].size(); i++){
+                    this->currentBlocks[this->current][i].y +=16;
+                }
 }
 void block::stopMoving(){
     this->moving[this->current] = false;
@@ -256,7 +280,8 @@ void block::changePos(int x, int y, int id){
         this->currentBlocks[id][i].y += y;
     }
 }
-void block::checkClear(){
+int block::checkClear(){
+    int clears = 0;
     for(int k = 0; k < 30; k++){
         int blockCount = 0;
         for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
@@ -265,19 +290,38 @@ void block::checkClear(){
                     blockCount ++;
             }
         }
-        if(blockCount >= 12)
+        if(blockCount >= 12){
             this->clear(k);
+            clears++;
+        }
     }
+    return clears;
 }
 void block::clear(int line){
     for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
         for(unsigned int j = 0; j < this->currentBlocks[i].size(); j ++){
             if(this->currentBlocks[i][j].y == line*16){
-                this->currentBlocks[i].erase(this->currentBlocks[i].begin() + j);
-                j--;
+                /*this->currentBlocks[i].erase(this->currentBlocks[i].begin() + j);
+                j--;*/
+                this->currentBlocks[i][j].x = -1;
+                this->currentBlocks[i][j].y = -1;
+                this->currentBlocks[i][j].w = -1;
+                this->currentBlocks[i][j].h = -1;
             }
             if(this->currentBlocks[i][j].y < line*16)
                 this->currentBlocks[i][j].y +=16;
+        }
+    }
+
+}
+void block::clean(){
+    for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
+        for(unsigned int j =0; j < this->currentBlocks[i].size(); j++){
+            if(this->currentBlocks[i][j].x == -1 && this->currentBlocks[i][j].y == -1 &&
+                this->currentBlocks[i][j].w == -1 && this->currentBlocks[i][j].h == -1){
+                    this->currentBlocks[i].erase(this->currentBlocks[i].begin() + j);
+                    cout << "CLEANED!" << endl;
+                }
         }
     }
 }
