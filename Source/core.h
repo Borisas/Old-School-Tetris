@@ -26,7 +26,10 @@ namespace core{
     bool collisionR(box a, box b);
     bool collisionL(box a, box b);
     void renderText(int x, int y, string text, int fontSize);
+    void renderText(int x, int y, string text, int fontSize, int R, int G, int B);
     GLuint SDLSurfaceToTexture(SDL_Surface* surface);
+    bool clickOn_LMB(box a, SDL_Event e);
+    bool mouseOver(box a, SDL_Event e);
 }
 
 #endif

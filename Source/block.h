@@ -37,6 +37,8 @@ class block
         int checkClear();
         void clear(int line);
         void clean();
+        bool loseCheck();
+        void newGame();
     protected:
     private:
         GLuint texture;
@@ -55,7 +57,7 @@ class block
         bool holding;
         int c_hold;
         bool c_drop;
-        int next;
+        unsigned int next;
         vector<bool> moving;
         vector<box> held;
         vector<box> temporary;

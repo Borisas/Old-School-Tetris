@@ -133,6 +133,28 @@ void core::renderText(int x, int y, string text, int fontSize){
         cout << "failed to create string" << endl;
     }
 };
+void core::renderText(int x, int y, string text, int fontSize, int R, int G, int B){
+    SDL_Color color = {R, G, B, 255};
+    SDL_Surface* textSurface;
+    TTF_Font *font = TTF_OpenFont("assets/font.ttf", fontSize);
+    textSurface = TTF_RenderText_Blended(font, text.c_str(), color);
+    if(textSurface != 0){
+        GLuint Texture = SDLSurfaceToTexture(textSurface);
+
+        box pos;
+        pos.x = x;
+        pos.y = y;
+        pos.w = textSurface->w;
+        pos.h = textSurface->h;
+        core::draw(Texture,pos);
+        glDeleteTextures(1, &Texture);
+        SDL_FreeSurface(textSurface);
+        TTF_CloseFont(font);
+	}
+	else{
+        cout << "failed to create string" << endl;
+    }
+};
 GLuint core::SDLSurfaceToTexture(SDL_Surface* surface)
 {
     GLuint texture;
@@ -185,4 +207,24 @@ string core::toString(int number){
     stringstream ss;
     ss << number;
     return ss.str();
+}
+bool core::clickOn_LMB(box a, SDL_Event e){
+	if(e.type == SDL_MOUSEBUTTONDOWN){
+		int mx = e.button.x;
+		int my = e.button.y;
+		if(mx>a.x && mx < a.x+a.w && my>a.y && my <a.y+a.h && e.button.button==SDL_BUTTON_LEFT)
+			return true;
+		else
+			return false;
+	}
+	else
+		return false;
+}
+bool core::mouseOver(box a, SDL_Event e){
+    int x = e.button.x;
+    int y = e.button.y;
+    if(x>a.x && x < a.x+a.w && y>a.y && y <a.y+a.h)
+        return true;
+    else
+        return false;
 }

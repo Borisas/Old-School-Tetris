@@ -7,9 +7,11 @@ class ui{
     public:
         ui();
         ~ui();
-        void draw(int score);
+        void drawGame(int score,int difficulty);
+        void drawMenu(int select);
     private:
-        box game_ui[8];
+        box game_ui[10];
+        box menu_ui[6];
 
 };
 

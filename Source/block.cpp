@@ -90,7 +90,7 @@ void block::update(int *score){
             this->c_drop = true;
 
 
-    core::renderText(500,300, "NEXT [id]: "+core::toString(this->next), 22);
+    core::renderText(440,300, "NEXT [id]: "+core::toString(this->next), 22);
 }
 void block::loadBlockSetup(const char* file){
     ifstream b_file(file);
@@ -106,8 +106,8 @@ void block::loadBlockSetup(const char* file){
                 for(int j=0; j < 4; j++){
                     b_file >> temp;
                     if(temp == 1){
-                        tempBox.x = this->startPos.x + 16 * (j+1);
-                        tempBox.y = this->startPos.y + 16 * (i+1);
+                        tempBox.x = this->startPos.x + 16 * (j);
+                        tempBox.y = this->startPos.y + 16 * (i);
                         tempBox.w = 16;
                         tempBox.h = 16;
                         tempBlock.push_back(tempBox);
@@ -126,7 +126,7 @@ void block::newBlock(int id){
     this->current = this->currentBlocks.size()-1;
     this->c_hold ++;
     this->rotation = 0;
-    int random = rand() % (this->b_db.size()-1);
+    unsigned int random = rand() % (this->b_db.size()-1);
         if(this->next == random){
             if(this->next == this->b_db.size()-1)
                 this->next -= 1;
@@ -323,5 +323,19 @@ void block::clean(){
                     cout << "CLEANED!" << endl;
                 }
         }
+    }
+}
+bool block::loseCheck(){
+    for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
+        for(unsigned int j = 0; j < this->currentBlocks[i].size(); j++){
+            if(this->currentBlocks[i][j].y == 0)
+                return true;
+        }
+    }
+    return false;
+}
+void block::newGame(){
+    for(unsigned int i = 0; i < this->currentBlocks.size(); i++){
+        this->currentBlocks.pop_back();
     }
 }
