@@ -7,7 +7,7 @@ Font in assets folder (font.ttf) is created by mrmanet, the original name is VCR
 [Downloaded from »](http://www.dafont.com/vcr-osd-mono.font)
 
 
-# To compile you will need
+# To compile you will need:
 * [SDL2»](https://www.libsdl.org/download-2.0.php)
 * [SDL2_image»](https://www.libsdl.org/projects/SDL_image/)
 * [SDL2_ttf»](https://www.libsdl.org/projects/SDL_ttf/)
