@@ -241,8 +241,6 @@ void block::rotate(){
                 for(unsigned int k = 0; k < this->currentBlocks[j].size(); k++){
                     while(core::collisionComp(this->currentBlocks[this->current][i], this->currentBlocks[j][k]) == 2){
                         this->modPos(this->current, 0, -16);
-                        //col = core::collisionComp(this->currentBlocks[this->current][i], this->currentBlocks[j][k]);
-                        //cout << col << endl;
                     }
                 }
             }
