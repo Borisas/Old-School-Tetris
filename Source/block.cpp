@@ -90,7 +90,7 @@ void block::update(int *score){
             this->c_drop = true;
 
 
-    core::renderText(440,300, "NEXT [id]: "+core::toString(this->next), 22);
+    //core::renderText(440,300, "NEXT [id]: "+core::toString(this->next), 22);
 }
 void block::loadBlockSetup(const char* file){
     ifstream b_file(file);
@@ -236,8 +236,23 @@ void block::rotate(){
             this->currentBlocks[this->current][i].x -= cxa -cx;
             this->currentBlocks[this->current][i].y -= cya -cy;
         }
-
-
+        for(unsigned int i = 0; i < this->currentBlocks[this->current].size(); i++){
+            for(unsigned int j = 0; j < this->currentBlocks.size()-1; j++){
+                for(unsigned int k = 0; k < this->currentBlocks[j].size(); k++){
+                    while(core::collisionComp(this->currentBlocks[this->current][i], this->currentBlocks[j][k]) == 2){
+                        this->modPos(this->current, 0, -16);
+                        //col = core::collisionComp(this->currentBlocks[this->current][i], this->currentBlocks[j][k]);
+                        //cout << col << endl;
+                    }
+                }
+            }
+            if(this->currentBlocks[this->current][i].x < 226)
+                this->modPos(this->current, 16,0);
+            if(this->currentBlocks[this->current][i].x + this->currentBlocks[this->current][i].w > 426)
+                this->modPos(this->current, -16,0);
+            if(this->currentBlocks[this->current][i].y + this->currentBlocks[this->current][i].h > 480)
+                this->modPos(this->current, 0, -16);
+        }
     }
 }
 void block::collision(){
@@ -335,7 +350,16 @@ bool block::loseCheck(){
     return false;
 }
 void block::newGame(){
-    for(unsigned int i = 0; i < this->currentBlocks.size(); i++){
-        this->currentBlocks.pop_back();
+    this->currentBlocks.clear();
+    this->held.clear();
+    this->moving.clear();
+    this->holding = false;
+    this->c_drop = true;
+    this->next = rand() % (this->b_db.size()-1);
+}
+void block::modPos(int id, int x, int y){
+    for(unsigned int i = 0; i < this->currentBlocks[id].size(); i++){
+        this->currentBlocks[id][i].x += x;
+        this->currentBlocks[id][i].y += y;
     }
 }

@@ -111,6 +111,23 @@ bool core::collisionL(box a, box b){
 		return true;
 	return false;
 };
+int core::collisionComp(box a, box b){
+    int leftA,leftB;
+	int rightA,rightB;
+	int topA, topB;
+	int botA, botB;
+
+	leftA = a.x;	leftB = b.x;
+	rightA = a.x+a.w;	rightB = b.x+b.w;
+	topA = a.y;	topB = b.y;
+	botA = a.y+a.h;	botB = b.y + b.h;
+
+	int ret = 0;
+
+    if(botA > topB)
+        ret+=2;
+	return ret;
+};
 void core::renderText(int x, int y, string text, int fontSize){
     SDL_Color color = {255, 255, 255, 255};
     SDL_Surface* textSurface;

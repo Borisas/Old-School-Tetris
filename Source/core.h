@@ -25,6 +25,7 @@ namespace core{
     bool collision(box a, box b);
     bool collisionR(box a, box b);
     bool collisionL(box a, box b);
+    int collisionComp(box a, box b);
     void renderText(int x, int y, string text, int fontSize);
     void renderText(int x, int y, string text, int fontSize, int R, int G, int B);
     GLuint SDLSurfaceToTexture(SDL_Surface* surface);

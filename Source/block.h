@@ -39,6 +39,7 @@ class block
         void clean();
         bool loseCheck();
         void newGame();
+        void modPos(int id, int x, int y);
     protected:
     private:
         GLuint texture;
