@@ -5,6 +5,7 @@ This is the source code for basic Old School tetris. Free to modify and change f
 Source code is in /Source folder, assets are in /assets folder.
 Font in assets folder (font.ttf) is created by mrmanet, the original name is VCR OSD Mono.
 [Downloaded from »](http://www.dafont.com/vcr-osd-mono.font)
+The entire project is under MIT license.
 
 
 # To compile you will need:
