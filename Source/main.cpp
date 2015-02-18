@@ -109,6 +109,11 @@ int main( int argc, char* args[] )
                 }
             }
         }
+        if(keystates[SDL_SCANCODE_UP]){
+            if(state == 1){
+                b.instaDrop();
+            }
+        }
         if(keystates[SDL_SCANCODE_UP] && state == 0){
             if(core::ticker(&tickA, 15)){
                 selected--;

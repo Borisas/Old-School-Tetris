@@ -40,6 +40,7 @@ class block
         bool loseCheck();
         void newGame();
         void modPos(int id, int x, int y);
+        void instaDrop();
     protected:
     private:
         GLuint texture;

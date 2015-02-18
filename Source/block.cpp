@@ -281,6 +281,12 @@ void block::drop(){
                     this->currentBlocks[this->current][i].y +=16;
                 }
 }
+void block::instaDrop(){
+    while(this->moving[this->current]){
+        this->collision();
+        this->drop();
+    }
+}
 void block::stopMoving(){
     this->moving[this->current] = false;
     if(core::ticker(&tickF, 50)){
@@ -316,10 +322,10 @@ void block::clear(int line){
             if(this->currentBlocks[i][j].y == line*16){
                 /*this->currentBlocks[i].erase(this->currentBlocks[i].begin() + j);
                 j--;*/
-                this->currentBlocks[i][j].x = -1;
-                this->currentBlocks[i][j].y = -1;
-                this->currentBlocks[i][j].w = -1;
-                this->currentBlocks[i][j].h = -1;
+                this->currentBlocks[i][j].x = 5000;
+                this->currentBlocks[i][j].y = 5000;
+                this->currentBlocks[i][j].w = 0;
+                this->currentBlocks[i][j].h = 0;
             }
             if(this->currentBlocks[i][j].y < line*16)
                 this->currentBlocks[i][j].y +=16;
@@ -330,8 +336,8 @@ void block::clear(int line){
 void block::clean(){
     for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
         for(unsigned int j =0; j < this->currentBlocks[i].size(); j++){
-            if(this->currentBlocks[i][j].x == -1 && this->currentBlocks[i][j].y == -1 &&
-                this->currentBlocks[i][j].w == -1 && this->currentBlocks[i][j].h == -1){
+            if(this->currentBlocks[i][j].x == 5000 && this->currentBlocks[i][j].y == 5000 &&
+                this->currentBlocks[i][j].w == 0 && this->currentBlocks[i][j].h == 0){
                     this->currentBlocks[i].erase(this->currentBlocks[i].begin() + j);
                     cout << "CLEANED!" << endl;
                 }
