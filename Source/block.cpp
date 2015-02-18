@@ -17,15 +17,18 @@ block::block(const char* img, const char* fallimg)
     this->startPos.y = 0;
     this->holding = false;
     this->loadBlockSetup("assets/blocks.txt");
+    cout << this->b_db.size() << " " << this->b_db.size()-1 << endl;
     srand (time(NULL));
     this->c_drop = true;
-    this->next = rand() % (this->b_db.size()-1);
+    this->next = rand() % (this->b_db.size()-2);
     //ctor
 }
 
 block::~block()
 {
     //dtor
+    glDeleteTextures(1, &texture);
+    glDeleteTextures(1, &fall_texture);
 }
 
 void block::draw(){
@@ -126,9 +129,9 @@ void block::newBlock(int id){
     this->current = this->currentBlocks.size()-1;
     this->c_hold ++;
     this->rotation = 0;
-    unsigned int random = rand() % (this->b_db.size()-1);
+    unsigned int random = rand() % (this->b_db.size()-2);
         if(this->next == random){
-            if(this->next == this->b_db.size()-1)
+            if(this->next == this->b_db.size()-2)
                 this->next -= 1;
             else
                 this->next +=1;
