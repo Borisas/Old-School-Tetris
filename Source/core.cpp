@@ -77,7 +77,7 @@ bool core::collision(box a, box b){
 	topA = a.y;	topB = b.y;
 	botA = a.y+a.h;	botB = b.y + b.h;
 
-	if(botA >= topB && topA <= botB && leftA < rightB && rightA > leftB)
+	if(botA >= topB && topA < botB  && leftA < rightB && rightA > leftB)
 		return true;
 	return false;
 };

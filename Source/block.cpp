@@ -261,7 +261,8 @@ void block::collision(){
     for(unsigned int i = 0; i < this->currentBlocks.size()-1; i++){
         for(unsigned int j = 0; j <  this->currentBlocks[i].size(); j++){
             for(unsigned int k = 0; k < this->currentBlocks[this->current].size(); k++){
-                if(core::collision(this->currentBlocks[this->current][k], this->currentBlocks[i][j])
+                if((core::collision(this->currentBlocks[this->current][k], this->currentBlocks[i][j])
+                    )
                     || this->currentBlocks[this->current][k].y + this->currentBlocks[this->current][k].h > 465){
                     this->moving[this->current] = false;
 
